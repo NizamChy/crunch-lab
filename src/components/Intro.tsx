@@ -23,7 +23,13 @@ export default function Intro({ onDone }: { onDone: () => void }) {
   }, []);
 
   useEffect(() => {
-    const lock = setInterval(() => getLenis()?.stop(), 50);
+    // Stop Lenis once it exists, then stop polling (it is restarted in onExitComplete).
+    const lock = setInterval(() => {
+      const l = getLenis();
+      if (!l) return;
+      if (!closed.current) l.stop();
+      clearInterval(lock);
+    }, 50);
     let p = 0;
     const timer = setInterval(() => {
       p = Math.min(100, p + Math.random() * 2.2 + 0.5);
