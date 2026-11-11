@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Bag from "./Bag";
 import { FLAVORS, PACK_PRICE } from "@/lib/flavors";
-import { useCart } from "@/store/cart";
 import { useFly } from "@/store/fly";
 import { crunch } from "@/lib/sound";
 
@@ -16,7 +15,6 @@ const SLOTS = [
 
 export default function BuildPack() {
   const [picked, setPicked] = useState<string[]>([]);
-  const add = useCart((s) => s.add);
   const launch = useFly((s) => s.launch);
   const orbRef = useRef<HTMLDivElement>(null);
 
@@ -36,10 +34,13 @@ export default function BuildPack() {
 
   function checkout() {
     if (!full) return;
-    picked.forEach((id, i) => setTimeout(() => orbRef.current && launch(id, orbRef.current), i * 120));
+    const slots = orbRef.current?.querySelectorAll("[data-slot-bag]") ?? [];
+    picked.forEach((id, i) => {
+      const el = slots[i] ?? orbRef.current;
+      if (el) launch(id, el, { delay: i * 0.12, label: i === picked.length - 1 ? "3-pack added to your basket" : null });
+    });
     crunch(1.2);
-    add(picked, "3-pack added to your basket");
-    setTimeout(() => setPicked([]), 500);
+    setPicked([]);
   }
 
   return (
@@ -77,7 +78,7 @@ export default function BuildPack() {
                   aria-pressed={on}
                 >
                   <span className="line-clamp-2 h-6 font-display text-[9px] leading-[1.05] tracking-wide">{f.name.toUpperCase()}</span>
-                  <Bag flavor={f} className={`w-[70%] transition duration-300 ${on || picked.length < 3 ? "" : "opacity-30 grayscale"}`} />
+                  <Bag lite flavor={f} className={`w-[70%] transition duration-300 ${on || picked.length < 3 ? "" : "opacity-30 grayscale"}`} />
                   <AnimatePresence>
                     {on && (
                       <motion.span
@@ -125,6 +126,7 @@ export default function BuildPack() {
                         exit={{ y: 140, opacity: 0, rotate: s.r * -3, scale: 0.5 }}
                         transition={{ type: "spring", stiffness: 220, damping: 14 }}
                         className="relative"
+                        data-slot-bag
                       >
                         <Bag flavor={f} className="bag-shadow w-full" />
                         <button

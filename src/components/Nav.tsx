@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import clsx from "clsx";
 import { useCart } from "@/store/cart";
+import { useFly } from "@/store/fly";
 import { scrollToId } from "@/lib/lenis";
 import { crunch } from "@/lib/sound";
 
@@ -23,6 +24,7 @@ export default function Nav() {
   const count = useCart((s) => s.items.length);
   const sound = useCart((s) => s.sound);
   const toggleSound = useCart((s) => s.toggleSound);
+  const landed = useFly((s) => s.landed);
 
   useEffect(() => {
     const els = LINKS.map((l) => document.getElementById(l.id)).filter(Boolean) as HTMLElement[];
@@ -97,21 +99,46 @@ export default function Nav() {
             {sound ? "On" : "Off"}
           </button>
 
-          <div
+          <motion.div
             id="basket-icon"
-            className={clsx("relative flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px]", onDark ? "bg-white/10" : "bg-black/5")}
+            key={landed}
+            animate={landed ? { scale: [1, 1.22, 0.94, 1], rotate: [0, -8, 5, 0] } : undefined}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className={clsx(
+              "relative flex items-center gap-1.5 overflow-visible rounded-full px-3 py-1.5 font-mono text-[11px]",
+              onDark ? "bg-white/10" : "bg-black/5"
+            )}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M5 9h14l-1.5 10.5a2 2 0 0 1-2 1.5h-7a2 2 0 0 1-2-1.5L5 9Z" />
               <path d="M9 9V6a3 3 0 0 1 6 0v3" />
             </svg>
-            <AnimatePresence mode="popLayout">
-              <motion.span key={count} initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }}>
-                {String(count).padStart(3, "0")}
-              </motion.span>
-            </AnimatePresence>
+            <span className="relative inline-block h-[1.2em] overflow-hidden">
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={count}
+                  className="inline-block"
+                  initial={{ y: "-100%" }}
+                  animate={{ y: "0%" }}
+                  exit={{ y: "100%" }}
+                  transition={{ type: "spring", stiffness: 500, damping: 32 }}
+                >
+                  {String(count).padStart(3, "0")}
+                </motion.span>
+              </AnimatePresence>
+            </span>
             {count > 0 && <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-hot" />}
-          </div>
+            {landed > 0 && (
+              <motion.span
+                className="pointer-events-none absolute -bottom-5 left-1/2 -translate-x-1/2 font-mono text-[11px] font-bold text-hot"
+                initial={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 0, y: 14 }}
+                transition={{ duration: 0.8 }}
+              >
+                +1
+              </motion.span>
+            )}
+          </motion.div>
 
           <button
             onClick={() => scrollToId("shop")}

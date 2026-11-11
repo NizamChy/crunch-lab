@@ -1,76 +1,90 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, animate, motion, useMotionValue, useTransform } from "motion/react";
 import { useEffect } from "react";
 import Bag from "./Bag";
 import { FLAVORS } from "@/lib/flavors";
-import { useFly } from "@/store/fly";
+import { useFly, type Flyer } from "@/store/fly";
 import { useCart } from "@/store/cart";
+import { crunch } from "@/lib/sound";
 
-function target() {
-  const el = document.getElementById("basket-icon");
-  if (!el) return { x: window.innerWidth - 80, y: 32 };
-  const r = el.getBoundingClientRect();
-  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+/** One bag flying along a smooth quadratic bezier into the basket. */
+function FlyingBag({ f }: { f: Flyer }) {
+  const land = useFly((s) => s.land);
+  const add = useCart((s) => s.add);
+  const flavor = FLAVORS.find((x) => x.id === f.flavorId)!;
+  const p = useMotionValue(0);
+
+  const cx = (f.from.x + f.to.x) / 2;
+  const cy = Math.min(f.from.y, f.to.y) - 220;
+  const bez = (a: number, c: number, b: number, t: number) => (1 - t) * (1 - t) * a + 2 * (1 - t) * t * c + t * t * b;
+  const x = useTransform(p, (t) => bez(f.from.x, cx, f.to.x, t) - f.from.w / 2);
+  const y = useTransform(p, (t) => bez(f.from.y, cy, f.to.y, t) - (f.from.w * 1.425) / 2);
+  const scale = useTransform(p, [0, 0.15, 1], [1, 1.08, 0.14]);
+  const rotate = useTransform(p, [0, 0.4, 1], [0, -18, 24]);
+  const opacity = useTransform(p, [0, 0.88, 1], [1, 1, 0]);
+
+  useEffect(() => {
+    const ctl = animate(p, 1, {
+      duration: 0.9,
+      delay: f.delay,
+      ease: [0.55, 0, 0.3, 1],
+      onComplete: () => {
+        crunch(0.6);
+        add([f.flavorId], f.label);
+        land(f.key);
+      },
+    });
+    return () => ctl.stop();
+    // run once per flyer
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <motion.div
+      className="absolute left-0 top-0 will-change-transform"
+      style={{ width: f.from.w, x, y, scale, rotate, opacity }}
+    >
+      <Bag flavor={flavor} className="w-full" lite />
+    </motion.div>
+  );
 }
 
 export default function Flyers() {
   const flyers = useFly((s) => s.flyers);
-  const remove = useFly((s) => s.remove);
   return (
     <div className="pointer-events-none fixed inset-0 z-[150]">
-      <AnimatePresence>
-        {flyers.map((f) => {
-          const flavor = FLAVORS.find((x) => x.id === f.flavorId)!;
-          const t = target();
-          const w = Math.min(f.from.w, 140);
-          return (
-            <motion.div
-              key={f.key}
-              className="absolute left-0 top-0"
-              style={{ width: w, marginLeft: -w / 2, marginTop: (-w * 1.42) / 2 }}
-              initial={{ x: f.from.x, y: f.from.y, scale: 1, rotate: 0, opacity: 1 }}
-              animate={{
-                x: [f.from.x, (f.from.x + t.x) / 2, t.x],
-                y: [f.from.y, Math.min(f.from.y, t.y) - 160, t.y],
-                scale: [1, 0.8, 0.12],
-                rotate: [0, -25, 200],
-              }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.85, ease: [0.6, 0, 0.4, 1] }}
-              onAnimationComplete={() => remove(f.key)}
-            >
-              <Bag flavor={flavor} className="bag-shadow w-full" />
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
+      {flyers.map((f) => (
+        <FlyingBag key={f.key} f={f} />
+      ))}
     </div>
   );
 }
 
 export function Toast() {
   const toast = useCart((s) => s.toast);
+  const toastId = useCart((s) => s.toastId);
   const clear = useCart((s) => s.clearToast);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(clear, 2600);
     return () => clearTimeout(t);
-  }, [toast, clear]);
+  }, [toast, toastId, clear]);
   return (
     <div className="pointer-events-none fixed bottom-6 left-1/2 z-[160] -translate-x-1/2">
-      <AnimatePresence>
+      <AnimatePresence mode="popLayout">
         {toast && (
           <motion.div
-            key={toast}
+            key={toastId}
             initial={{ y: 40, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 20, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 380, damping: 26 }}
-            className="rounded-full bg-ink px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-white shadow-2xl ring-1 ring-white/15"
+            exit={{ y: 20, opacity: 0, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+            className="flex items-center gap-2 whitespace-nowrap rounded-full bg-ink/95 px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-white shadow-2xl ring-1 ring-white/15 backdrop-blur"
           >
-            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-lime align-middle" />
-            {toast} · concept only, nothing is charged
+            <span className="grid h-4 w-4 place-items-center rounded-full bg-lime text-[9px] text-ink">✓</span>
+            {toast}
+            <span className="hidden text-white/40 md:inline">· concept only</span>
           </motion.div>
         )}
       </AnimatePresence>

@@ -4,8 +4,8 @@ import { useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import Bag from "./Bag";
 import { FLAVORS, type Flavor } from "@/lib/flavors";
-import { useCart } from "@/store/cart";
 import { useFly } from "@/store/fly";
+import AddButton from "./AddButton";
 import { crunch } from "@/lib/sound";
 
 function Card({ flavor, index }: { flavor: Flavor; index: number }) {
@@ -21,8 +21,6 @@ function Card({ flavor, index }: { flavor: Flavor; index: number }) {
   const bagY = useTransform(sy, [-0.5, 0.5], [-14, 14]);
   const glareX = useTransform(sx, [-0.5, 0.5], ["0%", "100%"]);
   const [pressed, setPressed] = useState(false);
-  const [added, setAdded] = useState(false);
-  const add = useCart((s) => s.add);
   const launch = useFly((s) => s.launch);
 
   const big = index === 4;
@@ -83,27 +81,20 @@ function Card({ flavor, index }: { flavor: Flavor; index: number }) {
           }}
         />
 
-        <div className="relative z-20 mt-3 flex items-center justify-between">
-          <span className="rounded-full bg-black/20 px-2.5 py-1 font-mono text-[10px] tracking-widest opacity-0 transition group-hover:opacity-100">
-            ${flavor.price.toFixed(2)}
-          </span>
-          <motion.button
-            aria-label={`Add ${flavor.name} to basket`}
-            whileTap={{ scale: 0.8 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (bagRef.current) launch(flavor.id, bagRef.current);
+        <div className="relative z-20 mt-3" style={{ transform: "translateZ(40px)" }}>
+          <p className="mb-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.2em] text-white/75">
+            <span>7.75 oz bag</span>
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-lime shadow-[0_0_6px_#39ff7a]" /> In stock
+            </span>
+          </p>
+          <AddButton
+            price={flavor.price}
+            onAdd={() => {
               crunch(1);
-              add([flavor.id], `${flavor.name} added to your basket`);
-              setAdded(true);
-              setTimeout(() => setAdded(false), 1400);
+              if (bagRef.current) launch(flavor.id, bagRef.current, { label: `${flavor.name} added to your basket` });
             }}
-            className="grid h-9 w-9 place-items-center rounded-full bg-ink text-white ring-2 ring-white/30 transition-colors hover:bg-white hover:text-ink"
-          >
-            <motion.span key={String(added)} initial={{ rotate: -90, scale: 0 }} animate={{ rotate: 0, scale: 1 }}>
-              {added ? "✓" : "+"}
-            </motion.span>
-          </motion.button>
+          />
         </div>
       </motion.div>
     </motion.div>
