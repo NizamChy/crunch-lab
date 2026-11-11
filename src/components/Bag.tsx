@@ -112,7 +112,7 @@ function Ingredient({ id, uid }: { id: string; uid: string }) {
           <ellipse rx="28" ry="9" fill="#e6e0d6" />
           <ellipse rx="23" ry="6.5" fill={id === "barbecue" ? "#5c1406" : "#8f1408"} />
           <ellipse cx="-6" cy="-2" rx="8" ry="2" fill="#fff" opacity="0.35" />
-          <path d="M14,-4 L40,-40" stroke="#6b3b1a" strokeWidth="4" strokeLinecap="round" />
+          <path d="M14,-4 L32,-24" stroke="#6b3b1a" strokeWidth="4" strokeLinecap="round" />
           <path d="M8,2 L16,-8 L22,-4 L14,6 Z" fill="#3b2412" />
         </g>
       );
@@ -198,19 +198,19 @@ export default function Bag({ flavor, side = "front", className, style, lite }: 
   const nameSize = longest > 16 ? 8.5 : longest > 11 ? 10 : 12;
   const speck = SPECK_COLOR[flavor.id];
   const hot = flavor.id === "flamin-hot";
-  const chipTint = hot ? "#ff4a1f" : "#f8c84a";
-  const chipDeep = hot ? "#b51c06" : "#d48a1a";
+  const chipTint = hot ? "#ff3d14" : "#ffc81e";
+  const chipDeep = hot ? "#c41a04" : "#f08c00";
   const labelBg = flavor.id === "classic" || flavor.id === "bacon-cheese" ? "#c8102e" : "#ffffff";
-  const labelInk = labelBg === "#ffffff" ? flavor.bagDark : "#ffffff";
+  const labelInk = labelBg === "#ffffff" ? flavor.card : "#ffffff";
 
   return (
     <svg viewBox="0 0 200 285" className={className} style={style} aria-label={`${flavor.name} chips bag`} role="img">
       <defs>
         <linearGradient id={id("body")} x1="0" x2="1">
           <stop offset="0" stopColor={flavor.bagDark} />
-          <stop offset="0.14" stopColor={flavor.bag} />
-          <stop offset="0.5" stopColor={flavor.bag} />
-          <stop offset="0.86" stopColor={flavor.bag} />
+          <stop offset="0.06" stopColor={flavor.bag} />
+          <stop offset="0.4" stopColor={flavor.bag} />
+          <stop offset="0.94" stopColor={flavor.bag} />
           <stop offset="1" stopColor={flavor.bagDark} />
         </linearGradient>
         <linearGradient id={id("seal")} x1="0" x2="0" y1="0" y2="1">
@@ -227,16 +227,16 @@ export default function Bag({ flavor, side = "front", className, style, lite }: 
           <stop offset="1" stopColor="#000" stopOpacity="0.45" />
         </linearGradient>
         <radialGradient id={id("puff")} cx="0.45" cy="0.42" r="0.66">
-          <stop offset="0" stopColor="#fff" stopOpacity="0.16" />
-          <stop offset="0.55" stopColor="#fff" stopOpacity="0" />
-          <stop offset="0.88" stopColor="#000" stopOpacity="0.16" />
-          <stop offset="1" stopColor="#000" stopOpacity="0.42" />
+          <stop offset="0" stopColor="#fff" stopOpacity="0.22" />
+          <stop offset="0.6" stopColor="#fff" stopOpacity="0" />
+          <stop offset="0.92" stopColor="#000" stopOpacity="0.04" />
+          <stop offset="1" stopColor="#000" stopOpacity="0.16" />
         </radialGradient>
         <linearGradient id={id("vshade")} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#000" stopOpacity="0.35" />
-          <stop offset="0.07" stopColor="#000" stopOpacity="0" />
-          <stop offset="0.93" stopColor="#000" stopOpacity="0" />
-          <stop offset="1" stopColor="#000" stopOpacity="0.4" />
+          <stop offset="0" stopColor="#000" stopOpacity="0.15" />
+          <stop offset="0.05" stopColor="#000" stopOpacity="0" />
+          <stop offset="0.95" stopColor="#000" stopOpacity="0" />
+          <stop offset="1" stopColor="#000" stopOpacity="0.18" />
         </linearGradient>
         <linearGradient id={id("streak")} x1="0" x2="1">
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
@@ -317,7 +317,12 @@ export default function Bag({ flavor, side = "front", className, style, lite }: 
         {side === "front" ? (
           <>
             {/* subtle flavour-tinted burst behind logo */}
-            <circle cx="100" cy="84" r="72" fill="#fff" opacity="0.08" />
+            <g transform="translate(100 84)" opacity="0.22">
+              {Array.from({ length: 16 }).map((_, i) => (
+                <path key={i} d="M0,0 L-9,-120 L9,-120 Z" fill="#fff" transform={`rotate(${i * 22.5})`} />
+              ))}
+            </g>
+            <circle cx="100" cy="84" r="54" fill="#fff" opacity="0.18" />
             {hot && <path d="M0,214 C60,200 140,226 200,208 L200,290 L0,290 Z" fill="#140303" />}
 
             {/* centre fin seal running down from the top */}
@@ -441,8 +446,7 @@ export default function Bag({ flavor, side = "front", className, style, lite }: 
       {/* crinkled foil texture (rasterised once by the browser) */}
       {!lite && (
         <g clipPath={url("clip")}>
-          <image href="/textures/crinkle.svg" x="0" y="0" width="200" height="285" preserveAspectRatio="none" opacity="0.2" style={{ mixBlendMode: "soft-light" }} />
-          <image href="/textures/crinkle-spec.svg" x="0" y="0" width="200" height="285" preserveAspectRatio="none" opacity="0.3" style={{ mixBlendMode: "screen" }} />
+          <image href="/textures/crinkle-spec.svg" x="0" y="0" width="200" height="285" preserveAspectRatio="none" opacity="0.18" style={{ mixBlendMode: "screen" }} />
         </g>
       )}
     </svg>
