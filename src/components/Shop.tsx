@@ -82,13 +82,14 @@ function Card({ flavor, index }: { flavor: Flavor; index: number }) {
         />
 
         <div className="relative z-20 mt-3" style={{ transform: "translateZ(40px)" }}>
-          <p className="mb-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.2em] text-white/75">
-            <span>7.75 oz bag</span>
+          <p className="mb-2 flex items-center justify-between gap-2 whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.12em] text-white/75">
+            <span>7.75 oz</span>
             <span className="flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-lime shadow-[0_0_6px_#39ff7a]" /> In stock
             </span>
           </p>
           <AddButton
+            label="Add"
             price={flavor.price}
             onAdd={() => {
               crunch(1);
