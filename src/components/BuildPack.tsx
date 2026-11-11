@@ -50,6 +50,7 @@ export default function BuildPack() {
         whileInView={{ clipPath: "inset(0% 0% 0% 0% round 28px)" }}
         viewport={{ once: true, margin: "-120px" }}
         transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
+        data-nav-dark
         className="grain relative grid overflow-hidden rounded-[28px] bg-[#17110e] p-6 text-white md:grid-cols-[1fr_1.2fr] md:p-12"
       >
         <div className="relative z-10">

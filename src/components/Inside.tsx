@@ -46,17 +46,30 @@ function seeded(seed: number) {
   };
 }
 
-function Chip({ fill = "#f3c96b" }: { fill?: string }) {
+/** Shared gradients, defined once (each chip used to redeclare the same id, so only the first colour ever rendered). */
+function ChipDefs() {
+  return (
+    <svg width="0" height="0" className="absolute" aria-hidden>
+      <defs>
+        {[
+          ["ins-chip-a", "#f3a64b"],
+          ["ins-chip-b", "#ff5a36"],
+        ].map(([id, c]) => (
+          <radialGradient key={id} id={id} cx="0.35" cy="0.35" r="0.75">
+            <stop offset="0" stopColor="#fff2c2" />
+            <stop offset="0.55" stopColor={c} />
+            <stop offset="1" stopColor="#c2410c" />
+          </radialGradient>
+        ))}
+      </defs>
+    </svg>
+  );
+}
+
+function Chip({ variant }: { variant: "a" | "b" }) {
   return (
     <svg viewBox="0 0 60 44" className="h-full w-full">
-      <defs>
-        <radialGradient id="ins-chip" cx="0.35" cy="0.35" r="0.75">
-          <stop offset="0" stopColor="#fff2c2" />
-          <stop offset="0.55" stopColor={fill} />
-          <stop offset="1" stopColor="#c2410c" />
-        </radialGradient>
-      </defs>
-      <path d="M6,22 C4,8 22,2 34,4 C50,6 58,16 55,27 C52,38 38,43 24,40 C12,38 7,32 6,22 Z" fill="url(#ins-chip)" />
+      <path d="M6,22 C4,8 22,2 34,4 C50,6 58,16 55,27 C52,38 38,43 24,40 C12,38 7,32 6,22 Z" fill={`url(#ins-chip-${variant})`} />
       <path d="M18,10 Q26,22 20,36 M30,7 Q38,22 32,39 M42,9 Q48,22 44,35" stroke="#9a3412" strokeOpacity="0.3" fill="none" strokeWidth="1.5" />
     </svg>
   );
@@ -118,6 +131,7 @@ export default function Inside() {
         .fromTo(q(".step-1"), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.5 }, 2.4)
         .to(q(".num-1"), { autoAlpha: 1, scale: 1, duration: 0.5 }, 2.4)
         .to(q(".bag3d"), { rotateZ: 10, rotateY: 25, x: "8vw", scale: 1.12, duration: 1.2 }, 2)
+        .to(q(".bag-floor"), { x: "8vw", duration: 1.2 }, 2)
         .to(q(".step-1 .callout"), { autoAlpha: 1, scale: 1, stagger: 0.15, duration: 0.5, ease: "back.out(2)" }, 2.8)
         .to(q(".dot-1"), { backgroundColor: "#fff", color: "#e01434", duration: 0.2 }, 2.2)
 
@@ -127,6 +141,7 @@ export default function Inside() {
         .fromTo(q(".step-2"), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.5 }, 4.4)
         .to(q(".num-2"), { autoAlpha: 1, scale: 1, duration: 0.5 }, 4.4)
         .to(q(".bag3d"), { rotateY: 180 + 18, rotateZ: -6, x: 0, scale: 1.05, duration: 1.4 }, 4)
+        .to(q(".bag-floor"), { x: 0, duration: 1.4 }, 4)
         .to(q(".step-2 .callout"), { autoAlpha: 1, scale: 1, stagger: 0.15, duration: 0.5, ease: "back.out(2)" }, 4.9)
         .to(q(".dot-2"), { backgroundColor: "#fff", color: "#e01434", duration: 0.2 }, 4.2)
 
@@ -138,6 +153,7 @@ export default function Inside() {
         .to(q(".flash"), { autoAlpha: 0.9, duration: 0.15 }, 7.2)
         .to(q(".flash"), { autoAlpha: 0, duration: 0.6 }, 7.35)
         .to(q(".bag3d"), { scale: 0.55, rotateZ: -22, y: "4vh", duration: 1.6, ease: "power3.out" }, 7.2)
+        .to(q(".bag-floor"), { scaleX: 0.5, autoAlpha: 0.5, duration: 1.6, ease: "power3.out" }, 7.2)
         .to(
           q(".fly-chip"),
           {
@@ -184,7 +200,7 @@ export default function Inside() {
         {/* titles */}
         {STEPS.map((s, i) => (
           <div key={i} className={`step step-${i} absolute inset-0 z-20`}>
-            <div className="absolute left-5 top-[30%] max-w-[340px] md:left-10 md:top-[34%]">
+            <div className="absolute left-5 top-[19%] max-w-[340px] md:left-10 md:top-[34%]">
               <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-white/70">
                 0{i + 1} / 03 — the bag
               </p>
@@ -211,27 +227,34 @@ export default function Inside() {
           </div>
         ))}
 
+        <ChipDefs />
+
         {/* chips burst */}
         <div className="pointer-events-none absolute left-1/2 top-1/2 z-10">
           {chips.map((c, i) => (
             <div
               key={i}
-              className="fly-chip absolute"
+              className="fly-chip absolute will-change-transform"
               style={{ width: c.size, height: c.size * 0.75, marginLeft: -c.size / 2, marginTop: -c.size * 0.37, filter: c.blur ? `blur(${c.blur}px)` : undefined }}
             >
-              <Chip fill={i % 3 === 0 ? "#ff5a36" : "#f3a64b"} />
+              <Chip variant={i % 3 === 0 ? "b" : "a"} />
             </div>
           ))}
         </div>
 
         {/* the bag */}
-        <div className="absolute left-1/2 top-1/2 z-[15] -translate-x-1/2 -translate-y-1/2" style={{ perspective: 1400 }}>
-          <div className="bag3d relative w-[min(46vw,40vh)] max-w-[300px] md:w-[min(22vw,44vh)]" style={{ transformStyle: "preserve-3d" }}>
+        <div className="absolute left-1/2 top-[64%] z-[15] -translate-x-1/2 md:top-1/2 -translate-y-1/2" style={{ perspective: 1400 }}>
+          {/* soft floor shadow: far cheaper than a drop-shadow filter re-rasterised on every 3D frame */}
+          <div className="bag-floor pointer-events-none absolute -bottom-[6%] left-1/2 h-[9%] w-[78%] -translate-x-1/2 rounded-[50%] bg-black/30 blur-xl" />
+          <div
+            className="bag3d relative w-[min(46vw,40vh)] max-w-[300px] md:w-[min(22vw,44vh)]"
+            style={{ transformStyle: "preserve-3d", willChange: "transform" }}
+          >
             <div style={{ backfaceVisibility: "hidden" }}>
-              <Bag flavor={flavor} className="bag-shadow w-full" />
+              <Bag flavor={flavor} className="w-full" />
             </div>
             <div className="absolute inset-0" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
-              <Bag flavor={flavor} side="back" className="bag-shadow w-full" />
+              <Bag flavor={flavor} side="back" className="w-full" />
             </div>
           </div>
         </div>

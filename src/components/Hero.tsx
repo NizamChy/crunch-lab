@@ -206,12 +206,13 @@ export default function Hero({ ready }: { ready: boolean }) {
           className="ml-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-white"
         >
           <span className="grid h-6 w-6 place-items-center rounded-full border border-white/60">{autoplay ? "❚❚" : "▶"}</span>
-          Autoplay
+          <span className="hidden sm:inline">Autoplay</span>
         </button>
       </div>
 
       {/* progress dots */}
-      <div className="absolute bottom-8 left-1/2 z-30 flex -translate-x-1/2 gap-1.5">
+      {/* mobile: right-aligned beside the controls so they don't collide; desktop: centred */}
+      <div className="absolute bottom-[42px] right-5 z-30 flex gap-1.5 md:bottom-8 md:right-auto md:left-1/2 md:-translate-x-1/2">
         {FLAVORS.map((f, i) => (
           <button
             key={f.id}
@@ -238,7 +239,7 @@ export default function Hero({ ready }: { ready: boolean }) {
       </div>
 
       {/* big index number */}
-      <div className="pointer-events-none absolute bottom-0 right-4 z-0 overflow-hidden font-wide text-[22vw] leading-[0.8] text-white/50 md:text-[13vw]">
+      <div className="pointer-events-none absolute bottom-0 right-4 z-0 hidden overflow-hidden font-wide text-[13vw] leading-[0.8] text-white/50 md:block">
         <AnimatePresence mode="popLayout">
           <motion.span
             key={active}

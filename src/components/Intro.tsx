@@ -60,6 +60,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
       {open && (
         <motion.div
           key="intro"
+          data-nav-dark
           className="grain fixed inset-0 z-[180] overflow-hidden"
           style={{ background: "radial-gradient(120% 90% at 50% 40%, #c2185b 0%, #8e0f45 55%, #4a0423 100%)" }}
           initial={{ clipPath: "circle(150% at 50% 50%)" }}

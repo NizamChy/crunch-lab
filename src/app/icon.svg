@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="s" cx="0.45" cy="0.4" r="0.65">
+      <stop offset="0" stop-color="#ffe46b"/>
+      <stop offset="1" stop-color="#ffb703"/>
+    </radialGradient>
+  </defs>
+  <g fill="#ffd23f">
+    <rect x="30" y="1" width="4" height="9" rx="2"/>
+    <rect x="30" y="1" width="4" height="9" rx="2" transform="rotate(45 32 32)"/>
+    <rect x="30" y="1" width="4" height="9" rx="2" transform="rotate(90 32 32)"/>
+    <rect x="30" y="1" width="4" height="9" rx="2" transform="rotate(135 32 32)"/>
+    <rect x="30" y="1" width="4" height="9" rx="2" transform="rotate(180 32 32)"/>
+    <rect x="30" y="1" width="4" height="9" rx="2" transform="rotate(225 32 32)"/>
+    <rect x="30" y="1" width="4" height="9" rx="2" transform="rotate(270 32 32)"/>
+    <rect x="30" y="1" width="4" height="9" rx="2" transform="rotate(315 32 32)"/>
+  </g>
+  <circle cx="32" cy="32" r="21" fill="url(#s)"/>
+  <path d="M4 27 Q32 19 60 27 L58 41 Q32 33 6 41 Z" fill="#d90429"/>
+  <text x="32" y="38.5" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-style="italic" font-size="15" fill="#fff">CL</text>
+</svg>

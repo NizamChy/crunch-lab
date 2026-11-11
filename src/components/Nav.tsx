@@ -17,10 +17,12 @@ const LINKS = [
   { id: "join", label: "Join" },
 ];
 
-const DARK_SECTIONS = new Set(["flavors", "inside", "join"]);
+/** Surfaces the nav should turn white over. Checked against whatever is actually under the bar, not the active section. */
+const DARK_SELECTOR = "#flavors, #inside, #join, [data-nav-dark]";
 
 export default function Nav() {
   const [active, setActive] = useState("flavors");
+  const [onDark, setOnDark] = useState(true);
   const count = useCart((s) => s.items.length);
   const sound = useCart((s) => s.sound);
   const toggleSound = useCart((s) => s.toggleSound);
@@ -38,7 +40,30 @@ export default function Nav() {
     return () => io.disconnect();
   }, []);
 
-  const onDark = DARK_SECTIONS.has(active);
+  // nav colour: sample the page just below the bar, at most once per frame
+  useEffect(() => {
+    let raf = 0;
+    const sample = () => {
+      raf = 0;
+      const hit = document
+        .elementsFromPoint(window.innerWidth / 2, 34)
+        // first real page surface: skips the bar itself and stray portals (dev overlay, extensions);
+        // pointer-events-none overlays (flyers, cursor) are already skipped by the browser
+        .find((el) => !el.closest("header") && el.closest("section, footer, [data-nav-dark]"));
+      setOnDark(!!hit?.closest(DARK_SELECTOR));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(sample);
+    };
+    sample();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
 
   return (
     <header className={clsx("fixed inset-x-0 top-0 z-[100] transition-colors duration-500", onDark ? "text-white" : "text-ink")}>

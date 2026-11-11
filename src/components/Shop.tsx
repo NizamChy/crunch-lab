@@ -24,6 +24,8 @@ function Card({ flavor, index }: { flavor: Flavor; index: number }) {
   const launch = useFly((s) => s.launch);
 
   const big = index === 4;
+  // 9 cards in a 2-col mobile grid leave the last one alone: let it span the row there
+  const last = index === FLAVORS.length - 1;
 
   return (
     <motion.div
@@ -31,7 +33,7 @@ function Card({ flavor, index }: { flavor: Flavor; index: number }) {
       whileInView={{ opacity: 1, y: 0, rotate: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.8, delay: (index % 5) * 0.07, ease: [0.22, 1, 0.36, 1] }}
-      className={big ? "md:row-span-2" : ""}
+      className={big ? "md:row-span-2" : last ? "col-span-2 md:col-span-1" : ""}
       style={{ perspective: 900 }}
     >
       <motion.div
@@ -64,7 +66,7 @@ function Card({ flavor, index }: { flavor: Flavor; index: number }) {
 
         <motion.div
           ref={bagRef}
-          className="relative z-10 mx-auto mt-auto w-[62%] pt-3"
+          className={`relative z-10 mx-auto mt-auto pt-3 ${last ? "w-[34%] md:w-[62%]" : "w-[62%]"}`}
           style={{ x: bagX, y: bagY, translateZ: 60 }}
           whileHover={{ rotate: -6, scale: 1.08 }}
           transition={{ type: "spring", stiffness: 260, damping: 14 }}

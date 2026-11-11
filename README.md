@@ -51,7 +51,7 @@ synthesized Web Audio "crunch" sound (toggle *Off/On*), film-grain overlay and `
 
 ```
 src/
-├─ app/                 # layout (fonts), globals.css, page
+├─ app/                 # layout (fonts), globals.css, page, icon.svg + apple-icon.tsx
 ├─ components/
 │  ├─ Site.tsx          # composes every section
 │  ├─ Intro.tsx         # loader and wipe
@@ -82,6 +82,34 @@ npm run dev        # http://localhost:3000
 ```bash
 npm run build && npm start   # production build
 ```
+
+## 🗺️ Roadmap
+
+Next steps for the project, in priority order. Ticked items are done.
+
+### Phase 1 — Polish & performance
+- [x] Mobile responsive pass: no sideways scroll, Inside text/bag split on phones, hero controls de-collided, last shop card spans the row
+- [x] Pinned *Inside* scene made lighter (`will-change`, floor shadow instead of re-rasterised drop-shadows, shared chip gradients)
+- [x] Brand favicon (`icon.svg`) + generated Apple touch icon
+- [ ] Lazy-load the React Three Fiber intro (`next/dynamic`) and skip it on low-end devices / `prefers-reduced-motion`
+- [ ] Fewer burst chips and no blur filters on small screens
+- [ ] Lighthouse + Web Vitals budget (LCP < 2.5s, INP < 200ms, CLS < 0.1) checked on every deploy
+- [ ] Open Graph / Twitter share image (`opengraph-image.tsx`)
+- [ ] Accessibility audit: keyboard control for carousel and rail, visible focus rings, `aria-live` toasts
+
+### Phase 2 — Make the store real
+- [ ] Cart drawer with quantities, remove, and a running total
+- [ ] Persist the basket across reloads (`zustand/middleware` persist)
+- [ ] Flavor detail pages (`/flavors/[id]`) with a shared-element bag transition
+- [ ] Checkout in Stripe **test mode**
+- [ ] Working newsletter signup (Server Action + email provider)
+
+### Phase 3 — Content, quality & scale
+- [ ] Headless CMS for flavors, prices and copy (e.g. Sanity)
+- [ ] Bangla / English i18n
+- [ ] Playwright e2e tests (add-to-basket, 3-pack, mobile nav) + visual regression screenshots
+- [ ] GitHub Actions CI: lint, typecheck and build on every PR
+- [ ] Privacy-friendly analytics (e.g. Vercel Analytics)
 
 ## 👤 Author
 
