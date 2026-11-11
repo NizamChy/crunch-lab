@@ -46,13 +46,13 @@ export default function AddButton({ price, onAdd, label = "Add to box", classNam
       transition={{ type: "spring", stiffness: 500, damping: 26 }}
       className={clsx(
         "group/add relative isolate flex h-11 w-full items-center gap-2 overflow-visible rounded-full pl-1.5 pr-4 text-[12px] font-semibold",
-        "shadow-[0_8px_20px_-8px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.12)]",
+        "shadow-[0_8px_20px_-8px_rgba(0,0,0,0.45),inset_0_-2px_0_rgba(0,0,0,0.06)]",
         className
       )}
     >
       {/* base + hover sweep + added fill */}
-      <span className="absolute inset-0 -z-10 overflow-hidden rounded-full bg-ink">
-        <span className="absolute inset-0 origin-left scale-x-0 rounded-full bg-white transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/add:scale-x-100" />
+      <span className="absolute inset-0 -z-10 overflow-hidden rounded-full bg-white">
+        <span className="absolute inset-0 origin-left scale-x-0 rounded-full bg-hot transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/add:scale-x-100" />
         <motion.span
           className="absolute inset-0 rounded-full bg-lime"
           initial={false}
@@ -65,7 +65,7 @@ export default function AddButton({ price, onAdd, label = "Add to box", classNam
       <span
         className={clsx(
           "relative grid h-8 w-8 shrink-0 place-items-center rounded-full transition-colors duration-300",
-          showAdded ? "bg-ink text-lime" : "bg-white text-ink group-hover/add:bg-ink group-hover/add:text-white"
+          showAdded ? "bg-ink text-lime" : "bg-hot text-white group-hover/add:bg-white group-hover/add:text-hot"
         )}
       >
         <AnimatePresence mode="popLayout" initial={false}>
@@ -126,7 +126,7 @@ export default function AddButton({ price, onAdd, label = "Add to box", classNam
             key={showAdded ? "added" : "add"}
             className={clsx(
               "block whitespace-nowrap transition-colors duration-300",
-              showAdded ? "text-ink" : "text-white group-hover/add:text-ink"
+              showAdded ? "text-ink" : "text-ink group-hover/add:text-white"
             )}
             initial={{ y: "110%" }}
             animate={{ y: "0%" }}
@@ -141,7 +141,7 @@ export default function AddButton({ price, onAdd, label = "Add to box", classNam
       <span
         className={clsx(
           "font-mono text-[11px] tabular-nums transition-colors duration-300",
-          showAdded ? "text-ink/70" : "text-white/60 group-hover/add:text-ink/60"
+          showAdded ? "text-ink/70" : "text-ink/55 group-hover/add:text-white/80"
         )}
       >
         ${price.toFixed(2)}

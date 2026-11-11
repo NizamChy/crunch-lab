@@ -119,7 +119,7 @@ export default function Shop() {
           </motion.h2>
         </div>
         <p className="max-w-[260px] text-[13px] leading-relaxed text-ink/60 md:text-right">
-          Tilt a card, press it, poke the bag. Hit <span className="inline-grid h-4 w-4 place-items-center rounded-full bg-ink text-[9px] text-white">+</span> to
+          Tilt a card, press it, poke the bag. Hit <span className="inline-grid h-4 w-4 place-items-center rounded-full bg-hot text-[9px] text-white">+</span> to
           drop a flavor into your box.
         </p>
       </div>
