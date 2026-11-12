@@ -54,8 +54,9 @@ export default function Hero({ ready }: { ready: boolean }) {
     setActive((a) => wrapIndex(a + dir, N));
   };
 
-  const spacing = vw < 768 ? vw * 0.3 : Math.min(vw * 0.13, 210);
-  const bagW = Math.min(vw < 768 ? 120 : Math.min(vw * 0.11, 170), vh * 0.2);
+  const mobile = vw < 768;
+  const spacing = mobile ? vw * 0.3 : Math.min(vw * 0.13, 210);
+  const bagW = Math.min(mobile ? 120 : Math.min(vw * 0.11, 170), vh * 0.2);
 
   return (
     <section
@@ -81,14 +82,17 @@ export default function Hero({ ready }: { ready: boolean }) {
 
       {/* concentric rings */}
       <motion.div className="absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2" style={{ x: ringX, y: ringY }}>
-        {Array.from({ length: 7 }).map((_, i) => (
+        {/* rings 0-2 (170-238vmax) are always fully covered by ring 3 (136vmax covers any viewport from the 46% centre),
+            so they only cost giant GPU layers; render 3..6 */}
+        {[3, 4, 5, 6].map((i) => (
           <motion.div
             key={i}
             className="absolute left-1/2 top-1/2 rounded-full"
             style={{ width: `${(7 - i) * 34}vmax`, height: `${(7 - i) * 34}vmax`, x: "-50%", y: "-50%" }}
             animate={{
               backgroundColor: i % 2 === 0 ? flavor.ring : flavor.bg,
-              scale: [1, 1.03, 1],
+              // the idle pulse keeps huge layers re-compositing every frame; too costly on phones
+              scale: mobile ? 1 : [1, 1.03, 1],
             }}
             transition={{
               backgroundColor: { duration: 0.9, delay: i * 0.06 },
@@ -110,7 +114,8 @@ export default function Hero({ ready }: { ready: boolean }) {
         {FLAVORS.map((f, i) => {
           const d = offset(i, active);
           const ad = Math.abs(d);
-          const visible = ad <= 4;
+          // on phones bags 3+ steps away sit off-screen anyway
+          const visible = ad <= (mobile ? 2 : 4);
           return (
             <motion.button
               key={f.id}
@@ -122,7 +127,7 @@ export default function Hero({ ready }: { ready: boolean }) {
                   setActive(i);
                 }
               }}
-              className="absolute left-1/2 top-[44%]"
+              className="absolute left-1/2 top-[44%] will-change-transform"
               style={{ width: bagW, marginLeft: -bagW / 2, marginTop: (-bagW * 1.42) / 2, zIndex: 20 - ad }}
               initial={{ opacity: 0, y: 300 }}
               animate={
@@ -134,7 +139,8 @@ export default function Hero({ ready }: { ready: boolean }) {
                       rotateZ: d * 7,
                       rotateY: d * -14,
                       opacity: visible ? 1 : 0,
-                      filter: d === 0 ? "blur(0px)" : `blur(${Math.max(0, ad - 2) * 1.5}px)`,
+                      // animated blur re-rasterises every frame: desktop only
+                      filter: mobile || d === 0 ? "blur(0px)" : `blur(${Math.max(0, ad - 2) * 1.5}px)`,
                     }
                   : { opacity: 0, y: 300 }
               }

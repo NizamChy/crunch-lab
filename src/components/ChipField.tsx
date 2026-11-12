@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 /** Procedural ridged potato chip: an elliptical disc, saddle-curved, with ridges. */
-function useChipGeometry() {
+function useChipGeometry(lite: boolean) {
   return useMemo(() => {
-    const g = new THREE.RingGeometry(0.001, 1, 96, 28);
+    const g = lite ? new THREE.RingGeometry(0.001, 1, 48, 14) : new THREE.RingGeometry(0.001, 1, 96, 28);
     const pos = g.attributes.position as THREE.BufferAttribute;
     const v = new THREE.Vector3();
     for (let i = 0; i < pos.count; i++) {
@@ -22,7 +22,7 @@ function useChipGeometry() {
     }
     g.computeVertexNormals();
     return g;
-  }, []);
+  }, [lite]);
 }
 
 type ChipData = { pos: THREE.Vector3; rot: THREE.Euler; spin: THREE.Vector3; speed: number; scale: number };
@@ -39,9 +39,9 @@ function makeChips(count: number): ChipData[] {
   return list;
 }
 
-function Chips({ count = 46 }: { count?: number }) {
+function Chips({ count = 46, lite = false }: { count?: number; lite?: boolean }) {
   const ref = useRef<THREE.InstancedMesh>(null);
-  const geo = useChipGeometry();
+  const geo = useChipGeometry(lite);
   const { viewport, pointer } = useThree();
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const data = useMemo(() => makeChips(count), [count]);
@@ -84,14 +84,20 @@ function Chips({ count = 46 }: { count?: number }) {
 }
 
 export default function ChipField({ fogColor = "#a3124a", count }: { fogColor?: string; count?: number }) {
+  // client-only (loaded with ssr: false). Phones: fewer, lower-poly chips at a capped pixel ratio.
+  const [lite] = useState(() => window.matchMedia("(max-width: 767px), (pointer: coarse)").matches);
   return (
-    <Canvas camera={{ position: [0, 0, 7], fov: 45 }} dpr={[1, 1.75]} gl={{ antialias: true, alpha: true }}>
+    <Canvas
+      camera={{ position: [0, 0, 7], fov: 45 }}
+      dpr={lite ? [1, 1.25] : [1, 1.75]}
+      gl={{ antialias: !lite, alpha: true, powerPreference: "high-performance" }}
+    >
       <fog attach="fog" args={[fogColor, 6, 20]} />
       <ambientLight intensity={0.55} />
       <hemisphereLight args={["#fff3d6", "#7a0b33", 0.9]} />
       <directionalLight position={[4, 6, 6]} intensity={2.4} color="#fff2c4" />
       <directionalLight position={[-6, -2, 2]} intensity={0.8} color="#ff7aa8" />
-      <Chips count={count} />
+      <Chips count={count ?? (lite ? 22 : 46)} lite={lite} />
     </Canvas>
   );
 }

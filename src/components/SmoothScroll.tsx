@@ -7,6 +7,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { setLenis } from "@/lib/lenis";
 
 gsap.registerPlugin(ScrollTrigger);
+// mobile browsers resize the viewport when the address bar shows/hides; refreshing on that makes pinned sections jump
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 export default function SmoothScroll() {
   useEffect(() => {

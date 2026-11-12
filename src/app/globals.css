@@ -54,6 +54,12 @@ body { overflow-x: hidden; }
 
 .bag-shadow { filter: drop-shadow(0 30px 30px rgba(0,0,0,0.35)) drop-shadow(0 6px 8px rgba(0,0,0,0.25)); }
 
+/* Phones: blend-mode grain over animated sections and stacked drop-shadows are the main jank sources */
+@media (max-width: 767px), (pointer: coarse) {
+  .grain::after { display: none; }
+  .bag-shadow { filter: drop-shadow(0 14px 12px rgba(0,0,0,0.3)); }
+}
+
 @keyframes float-y {
   0%, 100% { transform: translateY(0) rotate(-1deg); }
   50% { transform: translateY(-14px) rotate(1.5deg); }

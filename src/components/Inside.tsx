@@ -112,6 +112,7 @@ export default function Inside() {
           start: "top top",
           end: "+=450%",
           pin: true,
+          anticipatePin: 1,
           scrub: 1,
           onUpdate: (self) => {
             const p = gsap.utils.clamp(0, 1, (self.progress - 0.72) / 0.28);
@@ -234,8 +235,9 @@ export default function Inside() {
           {chips.map((c, i) => (
             <div
               key={i}
-              className="fly-chip absolute will-change-transform"
-              style={{ width: c.size, height: c.size * 0.75, marginLeft: -c.size / 2, marginTop: -c.size * 0.37, filter: c.blur ? `blur(${c.blur}px)` : undefined }}
+              // phones: 28 chips and no blur filters (70 blurred layers stutter during the scrubbed burst)
+              className={`fly-chip absolute will-change-transform ${i >= 28 ? "max-md:hidden" : ""} ${c.blur ? "md:[filter:blur(var(--b))]" : ""}`}
+              style={{ width: c.size, height: c.size * 0.75, marginLeft: -c.size / 2, marginTop: -c.size * 0.37, ["--b" as string]: c.blur ? `${c.blur}px` : undefined }}
             >
               <Chip variant={i % 3 === 0 ? "b" : "a"} />
             </div>
